@@ -1,26 +1,28 @@
 import os
 import httpx
+from iam_token import get_iam_token
 
-API_KEY = os.getenv("YANDEX_SEARCH_API_KEY")
+FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
-SEARCH_URL = "https://search-api.yandex.net/api/v1/search"
+# Новый официальный endpoint WebSearch API
+SEARCH_URL = "https://searchapi.api.cloud.yandex.net/websearch/v1/search"
 
 
 async def search_yandex(query: str, page: int = 1, page_size: int = 10):
-    if not API_KEY:
-        raise RuntimeError("YANDEX_SEARCH_API_KEY is not set")
+    iam_token = await get_iam_token()
 
     headers = {
-        "Authorization": f"Api-Key {API_KEY}",
+        "Authorization": f"Bearer {iam_token}",
         "Content-Type": "application/json"
     }
 
     payload = {
+        "folderId": FOLDER_ID,
         "query": query,
         "page": page,
         "pageSize": page_size,
-        "format": "HTML",        # или "XML"
-        "userDevice": "desktop"  # desktop / mobile
+        "userDevice": "desktop",
+        "format": "HTML"   # HTML выдача Яндекса
     }
 
     async with httpx.AsyncClient(timeout=20) as client:
@@ -29,9 +31,6 @@ async def search_yandex(query: str, page: int = 1, page_size: int = 10):
             headers=headers,
             json=payload
         )
+        print("RAW RESPONSE:", resp.text)  # временно для логов
         resp.raise_for_status()
-
-        # Временно выводим ответ в логи, чтобы видеть структуру
-        print("YANDEX SEARCH RAW RESPONSE:", resp.text)
-
         return resp.json()
