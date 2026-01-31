@@ -9,7 +9,6 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 # Папка со статикой (если понадобится)
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")
