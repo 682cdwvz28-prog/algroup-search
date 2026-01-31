@@ -45,9 +45,12 @@ async def search_yandex(query: str, page: int = 1):
     async with httpx.AsyncClient(timeout=20) as client:
         resp = await client.post(SEARCH_URL, headers=headers, json=payload)
 
-        # Полный вывод ответа API — это ключ к диагностике
+        # Полный DEBUG — ключ к диагностике
+        print("=== YANDEX DEBUG START ===")
         print("STATUS:", resp.status_code)
+        print("HEADERS:", resp.headers)
         print("TEXT:", resp.text)
+        print("=== YANDEX DEBUG END ===")
 
         resp.raise_for_status()
         return resp.json()
