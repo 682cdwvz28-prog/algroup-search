@@ -1,22 +1,20 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Результаты — Алгруп</title>
+    <title>Результаты поиска</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .results { margin-top: 20px; }
+    </style>
 </head>
 <body>
-    <h1>Результаты для: "{{ query }}"</h1>
+    <h1>Результаты поиска: {{ query }}</h1>
 
-    <p>В очередь поставлено писем: {{ queued }}</p>
+    <div class="results">
+        {{ html_raw | safe }}
+    </div>
 
-    <ul>
-    {% for item in emails %}
-        <li>
-            <strong>{{ item.email }}</strong> — {{ item.url }}
-        </li>
-    {% endfor %}
-    </ul>
-
-    <p><a href="/">Назад</a></p>
+    <p><a href="/">Новый поиск</a></p>
 </body>
 </html>

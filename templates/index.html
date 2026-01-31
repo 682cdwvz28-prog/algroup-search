@@ -1,19 +1,14 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Поиск и рассылка — Алгруп</title>
+    <title>Поиск Яндекса</title>
 </head>
 <body>
-    <h1>Поиск компаний и рассылка писем</h1>
-    <form method="post" action="/run">
-        <label>Поисковый запрос:</label><br>
-        <input type="text" name="query" size="60" value="кабель оптом"><br><br>
-
-        <label>Максимум сайтов:</label><br>
-        <input type="number" name="max_sites" value="5" min="1" max="50"><br><br>
-
-        <button type="submit">Запустить поиск и рассылку</button>
+    <h1>Поиск Яндекса</h1>
+    <form action="/run" method="post">
+        <input type="text" name="query" placeholder="Введите запрос" required>
+        <button type="submit">Искать</button>
     </form>
 </body>
 </html>
