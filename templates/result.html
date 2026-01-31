@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты — Алгруп</title>
+</head>
+<body>
+    <h1>Результаты для: "{{ query }}"</h1>
+
+    <p>В очередь поставлено писем: {{ queued }}</p>
+
+    <ul>
+    {% for item in emails %}
+        <li>
+            <strong>{{ item.email }}</strong> — {{ item.url }}
+        </li>
+    {% endfor %}
+    </ul>
+
+    <p><a href="/">Назад</a></p>
+</body>
+</html>
