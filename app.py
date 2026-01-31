@@ -14,16 +14,7 @@ async def index(request: Request):
 
 @app.post("/run", response_class=HTMLResponse)
 async def run(request: Request, query: str = Form(...)):
-    data = await search_yandex(query)
-
-    # Ищем HTML в разных вариантах ответа
-    html_raw = (
-        data.get("html") or
-        data.get("result") or
-        data.get("results") or
-        data.get("response") or
-        data
-    )
+    html_raw = await search_yandex(query)
 
     return templates.TemplateResponse(
         "result.html",

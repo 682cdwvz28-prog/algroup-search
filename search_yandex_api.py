@@ -1,14 +1,14 @@
 import os
 import httpx
+import base64
 from iam_token import get_iam_token
 
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
-# Новый официальный endpoint WebSearch API
-SEARCH_URL = "https://searchapi.api.cloud.yandex.net/websearch/v1/search"
+SEARCH_URL = "https://searchapi.api.cloud.yandex.net/v2/web/search"
 
 
-async def search_yandex(query: str, page: int = 1, page_size: int = 10):
+async def search_yandex(query: str, page: int = 1):
     iam_token = await get_iam_token()
 
     headers = {
@@ -17,12 +17,28 @@ async def search_yandex(query: str, page: int = 1, page_size: int = 10):
     }
 
     payload = {
+        "query": {
+            "searchType": "WEB",
+            "queryText": query,
+            "page": page,
+            "familyMode": "NONE",
+            "fixTypoMode": "DEFAULT"
+        },
+        "sortSpec": {
+            "sortMode": "RELEVANCE",
+            "sortOrder": "DESC"
+        },
+        "groupSpec": {
+            "groupMode": "FLAT",
+            "groupsOnPage": 10,
+            "docsInGroup": 1
+        },
+        "maxPassages": 0,
+        "region": 213,
+        "l10N": "ru",
         "folderId": FOLDER_ID,
-        "query": query,
-        "page": page,
-        "pageSize": page_size,
-        "userDevice": "desktop",
-        "format": "HTML"   # HTML выдача Яндекса
+        "responseFormat": "HTML",
+        "userAgent": "Mozilla/5.0"
     }
 
     async with httpx.AsyncClient(timeout=20) as client:
@@ -31,6 +47,13 @@ async def search_yandex(query: str, page: int = 1, page_size: int = 10):
             headers=headers,
             json=payload
         )
-        print("RAW RESPONSE:", resp.text)  # временно для логов
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+
+        # Декодируем Base64 → HTML
+        raw = data.get("rawData")
+        if raw:
+            decoded = base64.b64decode(raw).decode("utf-8")
+            return decoded
+
+        return None
