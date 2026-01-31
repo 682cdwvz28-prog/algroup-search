@@ -83,29 +83,7 @@
 <form id="results-form" action="/compose" method="post" style="display:none;">
     <input type="hidden" name="search_id" value="{{ search_id }}">
 
-    <table id="results-table">
-        <tr>
-            <th></th>
-            <th>Запрос</th>
-            <th>Сайт</th>
-            <th>E‑mail</th>
-        </tr>
-
-        {% for row in rows %}
-        {% for email in row.emails %}
-        <tr>
-            <td>
-                <input type="checkbox" name="selected" value="{{ row.query }}|{{ email }}">
-            </td>
-            <td>{{ row.query }}</td>
-            <td><a href="{{ row.url }}" target="_blank">{{ row.short_url }}</a></td>
-            <td>{{ email }}</td>
-        </tr>
-        {% endfor %}
-        {% endfor %}
-    </table>
-
-    <button type="submit">Составить письма</button>
+    <!-- Сюда будет подставляться таблица -->
 </form>
 
 <script>
@@ -124,11 +102,10 @@
         const p = Math.round((data.progress || 0) * 100);
         progressBar.style.width = p + "%";
 
-        if (p >= 100) {
+        if (data.done || p >= 100) {
             ws.close();
             loading.innerText = "Готово! Загружаю результаты…";
 
-            // Загружаем обновлённую таблицу
             const formData = new FormData();
             formData.append("search_id", searchId);
 
@@ -138,7 +115,9 @@
             });
 
             const html = await resp.text();
-            document.body.innerHTML = html;
+            form.innerHTML = html;
+            form.style.display = "block";
+            loading.style.display = "none";
         }
     };
 </script>

@@ -1,0 +1,23 @@
+<table id="results-table">
+    <tr>
+        <th></th>
+        <th>Запрос</th>
+        <th>Сайт</th>
+        <th>E‑mail</th>
+    </tr>
+
+    {% for row in rows %}
+    {% for email in row.emails %}
+    <tr>
+        <td>
+            <input type="checkbox" name="selected" value="{{ row.query }}|{{ email }}">
+        </td>
+        <td>{{ row.query }}</td>
+        <td><a href="{{ row.url }}" target="_blank">{{ row.short_url }}</a></td>
+        <td>{{ email }}</td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+</table>
+
+<button type="submit">Составить письма</button>
