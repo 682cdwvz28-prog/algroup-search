@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование писем</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .block {
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+
+        .emails {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #005fcc;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Редактирование писем</h2>
+
+<form action="/send" method="post">
+    <input type="hidden" name="search_id" value="{{ search_id }}">
+
+    {% for query, emails in per_query.items() %}
+    <div class="block">
+        <h3>Запрос: {{ query }}</h3>
+
+        <div class="emails">
+            <b>E‑mail адреса:</b><br>
+            {{ emails|join(", ") }}
+        </div>
+
+        <textarea name="body_{{ loop.index }}">
+Здравствуйте!
+
+Нашёл ваш сайт по запросу "{{ query }}". Хотел бы уточнить информацию по вашему товару/услуге.
+
+С уважением,
+        </textarea>
+
+        <input type="hidden" name="emails_{{ loop.index }}" value="{{ emails|join(',') }}">
+        <input type="hidden" name="query_{{ loop.index }}" value="{{ query }}">
+    </div>
+    {% endfor %}
+
+    <button type="submit">Отправить письма</button>
+</form>
+
+</body>
+</html>

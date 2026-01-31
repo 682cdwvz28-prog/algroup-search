@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Письма отправлены</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            padding: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .block {
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+
+        .emails {
+            font-size: 14px;
+            color: #444;
+            margin-top: 8px;
+        }
+
+        .success {
+            padding: 12px;
+            background: #e6ffe6;
+            border: 1px solid #8cd98c;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #2d7a2d;
+            font-size: 15px;
+        }
+
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #0078ff;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        a.button:hover {
+            background: #005fcc;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Письма успешно отправлены</h2>
+
+<div class="success">
+    Все выбранные письма были отправлены по указанным адресам.
+</div>
+
+{% for block in blocks %}
+<div class="block">
+    <h3>Запрос: {{ block.query }}</h3>
+
+    {% if block.emails %}
+        <div class="emails">
+            <b>Отправлено на:</b><br>
+            {{ block.emails|join(", ") }}
+        </div>
+    {% else %}
+        <div class="emails">
+            <b>Нет e‑mail для отправки.</b>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+<a href="/" class="button">Новый поиск</a>
+
+</body>
+</html>

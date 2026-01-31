@@ -3,74 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <title>Результаты поиска</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #fafafa;
-            margin: 0;
-            padding: 20px 40px;
+            padding: 20px;
         }
 
-        .search-header {
-            font-size: 24px;
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        #progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
             margin-bottom: 20px;
-            color: #333;
+            display: none;
         }
 
-        .result {
-            margin-bottom: 28px;
+        #progress-bar {
+            height: 12px;
+            width: 0%;
+            background: #0078ff;
+            transition: width 0.3s ease;
         }
 
-        .result a.title {
-            font-size: 20px;
-            color: #1a0dab;
-            text-decoration: none;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
         }
 
-        .result a.title:hover {
-            text-decoration: underline;
-        }
-
-        .url {
-            font-size: 14px;
-            color: #006621;
-            margin-bottom: 4px;
-        }
-
-        .snippet {
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
             font-size: 15px;
-            color: #444;
-            line-height: 1.4;
         }
 
-        .domain {
-            font-size: 13px;
-            color: #777;
+        th {
+            background: #f0f0f0;
         }
 
-        .container {
-            max-width: 800px;
-            margin: auto;
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        #loading {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<h2>Результаты поиска</h2>
 
-    <div class="search-header">
-        Результаты поиска: {{ query }}
-    </div>
-
-    {% for item in results %}
-    <div class="result">
-        <div class="url">{{ item.domain }}</div>
-        <a href="{{ item.url }}" class="title" target="_blank">{{ item.title }}</a>
-        <div class="snippet">{{ item.snippet }}</div>
-    </div>
-    {% endfor %}
-
+<!-- Прогресс-бар -->
+<div id="progress-container">
+    <div id="progress-bar"></div>
 </div>
+
+<div id="loading">⏳ Идёт сбор сайтов и e‑mail…</div>
+
+<form id="results-form" action="/compose" method="post" style="display:none;">
+    <input type="hidden" name="search_id" value="{{ search_id }}">
+
+    <table id="results-table">
+        <tr>
+            <th></th>
+            <th>Запрос</th>
+            <th>Сайт</th>
+            <th>E‑mail</th>
+        </tr>
+
+        {% for row in rows %}
+        {% for email in row.emails %}
+        <tr>
+            <td>
+                <input type="checkbox" name="selected" value="{{ row.query }}|{{ email }}">
+            </td>
+            <td>{{ row.query }}</td>
+            <td><a href="{{ row.url }}" target="_blank">{{ row.short_url }}</a></td>
+            <td>{{ email }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+    </table>
+
+    <button type="submit">Составить письма</button>
+</form>
+
+<script>
+    const searchId = "{{ search_id }}";
+    const ws = new WebSocket(`wss://${location.host}/ws/${searchId}`);
+
+    const progressContainer = document.getElementById("progress-container");
+    const progressBar = document.getElementById("progress-bar");
+    const loading = document.getElementById("loading");
+    const form = document.getElementById("results-form");
+
+    progressContainer.style.display = "block";
+
+    ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        const p = Math.round((data.progress || 0) * 100);
+        progressBar.style.width = p + "%";
+
+        if (p >= 100) {
+            ws.close();
+            loading.innerText = "Готово! Загружаю результаты…";
+
+            // Загружаем обновлённую таблицу
+            const formData = new FormData();
+            formData.append("search_id", searchId);
+
+            const resp = await fetch("/refresh_results", {
+                method: "POST",
+                body: formData
+            });
+
+            const html = await resp.text();
+            document.body.innerHTML = html;
+        }
+    };
+</script>
 
 </body>
 </html>

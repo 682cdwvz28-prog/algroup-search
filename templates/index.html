@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Поиск Яндекса</title>
+    <title>Поиск сайтов и e-mail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            padding: 40px;
+            text-align: center;
+        }
+        .box {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(0,0,0,0.1);
+        }
+        input[type=text] {
+            width: 90%;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: #0078ff;
+            color: white;
+            cursor: pointer;
+        }
+        #spinner {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+    <script>
+        function showSpinner() {
+            document.getElementById("spinner").style.display = "block";
+        }
+    </script>
 </head>
 <body>
-    <h1>Поиск Яндекса</h1>
-    <form action="/run" method="post">
-        <input type="text" name="query" placeholder="Введите запрос" required>
+
+<div class="box">
+    <h2>Поиск сайтов и e-mail</h2>
+    <form action="/search" method="post" onsubmit="showSpinner()">
+        <input type="text" name="raw_query" placeholder="Введите запросы через запятую">
+        <br>
         <button type="submit">Искать</button>
     </form>
+
+    <div id="spinner">⏳ Выполняется поиск…</div>
+</div>
+
 </body>
 </html>
