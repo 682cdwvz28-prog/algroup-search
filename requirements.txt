@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 httpx
+beautifulsoup4
+lxml
 python-multipart
 jinja2
-PyJWT
-cryptography
