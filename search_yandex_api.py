@@ -37,8 +37,8 @@ async def search_yandex(query: str, page: int = 1):
         "l10N": "ru",
         "folderId": FOLDER_ID,
 
-        # ВАЖНО: HTML НЕ ПОДДЕРЖИВАЕТСЯ
-        "responseFormat": "XML",
+        # ВАЖНО: только JSON или PROTOBUF
+        "responseFormat": "FORMAT_JSON",
 
         "userAgent": "Mozilla/5.0"
     }
@@ -49,8 +49,5 @@ async def search_yandex(query: str, page: int = 1):
         resp.raise_for_status()
         data = resp.json()
 
-        raw = data.get("rawData")
-        if raw:
-            return base64.b64decode(raw).decode("utf-8")
-
-        return None
+        # В v2 rawData может отсутствовать — зависит от формата
+        return data
