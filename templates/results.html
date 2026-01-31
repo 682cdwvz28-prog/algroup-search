@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты поиска</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            margin: 0;
+            padding: 20px 40px;
+        }
+
+        .search-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .result {
+            margin-bottom: 28px;
+        }
+
+        .result a.title {
+            font-size: 20px;
+            color: #1a0dab;
+            text-decoration: none;
+        }
+
+        .result a.title:hover {
+            text-decoration: underline;
+        }
+
+        .url {
+            font-size: 14px;
+            color: #006621;
+            margin-bottom: 4px;
+        }
+
+        .snippet {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.4;
+        }
+
+        .domain {
+            font-size: 13px;
+            color: #777;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="search-header">
+        Результаты поиска: {{ query }}
+    </div>
+
+    {% for item in results %}
+    <div class="result">
+        <div class="url">{{ item.domain }}</div>
+        <a href="{{ item.url }}" class="title" target="_blank">{{ item.title }}</a>
+        <div class="snippet">{{ item.snippet }}</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

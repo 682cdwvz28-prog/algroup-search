@@ -1,5 +1,7 @@
 import os
 import httpx
+import base64
+import xml.etree.ElementTree as ET
 
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 API_KEY = os.getenv("YANDEX_SEARCH_API_KEY")
@@ -35,4 +37,29 @@ async def search_yandex(query: str, page: int = 1):
         print("=== YANDEX DEBUG END ===")
 
         resp.raise_for_status()
-        return resp.json()
+        data = resp.json()
+
+    raw = data.get("rawData")
+    if not raw:
+        return []
+
+    xml_text = base64.b64decode(raw).decode("utf-8")
+    root = ET.fromstring(xml_text)
+
+    results = []
+
+    for doc in root.findall(".//doc"):
+        title = doc.findtext("title")
+        url = doc.findtext("url")
+        domain = doc.findtext("domain")
+        snippet = doc.findtext("headline")
+
+        if title and url:
+            results.append({
+                "title": title,
+                "url": url,
+                "domain": domain,
+                "snippet": snippet
+            })
+
+    return results
