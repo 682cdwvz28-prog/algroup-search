@@ -1,6 +1,5 @@
 import os
 import httpx
-import base64
 
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 API_KEY = os.getenv("YANDEX_SEARCH_API_KEY")
@@ -37,7 +36,7 @@ async def search_yandex(query: str, page: int = 1):
         "l10N": "ru",
         "folderId": FOLDER_ID,
 
-        # ВАЖНО: только JSON или PROTOBUF
+        # ВАЖНО: только эти значения работают в v2
         "responseFormat": "FORMAT_JSON",
 
         "userAgent": "Mozilla/5.0"
@@ -45,9 +44,10 @@ async def search_yandex(query: str, page: int = 1):
 
     async with httpx.AsyncClient(timeout=20) as client:
         resp = await client.post(SEARCH_URL, headers=headers, json=payload)
-        print("DEBUG:", resp.text)
-        resp.raise_for_status()
-        data = resp.json()
 
-        # В v2 rawData может отсутствовать — зависит от формата
-        return data
+        # Полный вывод ответа API — это ключ к диагностике
+        print("STATUS:", resp.status_code)
+        print("TEXT:", resp.text)
+
+        resp.raise_for_status()
+        return resp.json()
