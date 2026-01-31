@@ -5,6 +5,7 @@ from iam_token import get_iam_token
 
 FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
+# Официальный рабочий endpoint WebSearch API v2
 SEARCH_URL = "https://searchapi.api.cloud.yandex.net/v2/web/search"
 
 
@@ -16,44 +17,40 @@ async def search_yandex(query: str, page: int = 1):
         "Content-Type": "application/json"
     }
 
+    # Полностью корректный payload под WebSearch API v2
     payload = {
         "query": {
             "searchType": "WEB",
             "queryText": query,
-            "page": page,
-            "familyMode": "NONE",
-            "fixTypoMode": "DEFAULT"
+            "familyMode": "FAMILY_MODE_UNSPECIFIED",
+            "page": str(page),
+            "fixTypoMode": "FIX_TYPO_MODE_UNSPECIFIED",
+            "userAgent": "Mozilla/5.0"
         },
         "sortSpec": {
-            "sortMode": "RELEVANCE",
-            "sortOrder": "DESC"
+            "sortMode": "SORT_MODE_UNSPECIFIED",
+            "sortOrder": "SORT_ORDER_UNSPECIFIED"
         },
         "groupSpec": {
-            "groupMode": "FLAT",
+            "groupMode": "GROUP_MODE_UNSPECIFIED",
             "groupsOnPage": 10,
             "docsInGroup": 1
         },
         "maxPassages": 0,
-        "region": 213,
+        "region": "213",
         "l10N": "ru",
         "folderId": FOLDER_ID,
-        "responseFormat": "HTML",
-        "userAgent": "Mozilla/5.0"
+        "responseFormat": "HTML"
     }
 
     async with httpx.AsyncClient(timeout=20) as client:
-        resp = await client.post(
-            SEARCH_URL,
-            headers=headers,
-            json=payload
-        )
+        resp = await client.post(SEARCH_URL, headers=headers, json=payload)
         resp.raise_for_status()
         data = resp.json()
 
         # Декодируем Base64 → HTML
         raw = data.get("rawData")
         if raw:
-            decoded = base64.b64decode(raw).decode("utf-8")
-            return decoded
+            return base64.b64decode(raw).decode("utf-8")
 
         return None
