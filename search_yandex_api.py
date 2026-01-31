@@ -36,7 +36,10 @@ async def search_yandex(query: str, page: int = 1):
         "region": "213",
         "l10N": "ru",
         "folderId": FOLDER_ID,
-        "responseFormat": "HTML",
+
+        # ВАЖНО: HTML НЕ ПОДДЕРЖИВАЕТСЯ
+        "responseFormat": "XML",
+
         "userAgent": "Mozilla/5.0"
     }
 
