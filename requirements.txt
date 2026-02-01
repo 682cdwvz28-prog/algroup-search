@@ -5,6 +5,3 @@ beautifulsoup4
 lxml
 python-multipart
 jinja2
-git add search_yandex_api.py
-git commit -m "Use real ya.ru search HTML parser"
-git push
