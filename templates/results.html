@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты поиска</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fafafa;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        #progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        #progress-bar {
+            height: 12px;
+            width: 0%;
+            background: #0078ff;
+            transition: width 0.3s ease;
+        }
+
+        #loading {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+
+        th {
+            background: #f0f0f0;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 16px;
+            background: #0078ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Результаты поиска</h2>
+
+<!-- Прогресс-бар -->
+<div id="progress-container">
+    <div id="progress-bar"></div>
+</div>
+
+<div id="loading">⏳ Идёт сбор сайтов и e‑mail…</div>
+
+<!-- Форма, в которую будет подставлена таблица -->
+<form id="results-form" action="/compose" method="post" style="display:none;">
+    <input type="hidden" name="search_id" value="{{ search_id }}">
+</form>
+
+<script>
+    const searchId = "{{ search_id }}";
+    const ws = new WebSocket(`wss://${location.host}/ws/${searchId}`);
+
+    const progressContainer = document.getElementById("progress-container");
+    const progressBar = document.getElementById("progress-bar");
+    const loading = document.getElementById("loading");
+    const form = document.getElementById("results-form");
+
+    progressContainer.style.display = "block";
+
+    ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        const p = Math.round((data.progress || 0) * 100);
+        progressBar.style.width = p + "%";
+
+        if (data.done || p >= 100) {
+            ws.close();
+            loading.innerText = "Готово! Загружаю результаты…";
+
+            const formData = new FormData();
+            formData.append("search_id", searchId);
+
+            const resp = await fetch("/refresh_results", {
+                method: "POST",
+                body: formData
+            });
+
+            const html = await resp.text();
+            form.innerHTML = html;  // вставляем таблицу
+            form.style.display = "block";
+            loading.style.display = "none";
+        }
+    };
+</script>
+
+</body>
+</html>
